@@ -11,7 +11,7 @@ handler.formatter = logging.Formatter(
 logging.root.addHandler(handler)
 logger.setLevel(logging.DEBUG)
 
-NV_SOCK = 'NVIM_LISTEN_ADDRESS' #'LLTEST_SOCK'
+NV_SOCK = 'NVIM_LISTEN_ADDRESS' #'GGTEST_SOCK'
 if NV_SOCK not in os.environ:
   print('${} not set!'.format(NV_SOCK))
   exit(1)

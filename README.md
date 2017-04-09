@@ -44,13 +44,7 @@ and communicates with the Neovim process using RPC calls.
 The plugin is being developed keeping 3 broad goals in mind:
 
 * **Ease of use**: Users with almost zero knowledge of command line debuggers should feel comfortable using this plugin.
-* **Completeness**: Experienced users of LLDB should not feel restricted.
+* **Completeness**: Experienced users of GDB should not feel restricted.
 * **Customizability**: Users should be able to bend this plugin to their needs.
 
 ## FAQ
-
-#### The program counter is pointing to the wrong line in the source file at a breakpoint hit.
-
-Try clang instead of gcc (fingers crossed). See [clang comparison](http://clang.llvm.org/comparison.html#gcc):
-
->Clang does not implicitly simplify code as it parses it like GCC does. Doing so causes many problems for source analysis tools.

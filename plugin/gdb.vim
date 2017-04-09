@@ -21,15 +21,15 @@ endif
 let s:bp_symbol = get(g:, 'gdb#sign#bp_symbol', 'B>')
 let s:pc_symbol = get(g:, 'gdb#sign#pc_symbol', '->')
 
-highlight default link LLBreakpointSign Type
-highlight default link LLUnselectedPCSign NonText
-highlight default link LLUnselectedPCLine DiffChange
-highlight default link LLSelectedPCSign Debug
-highlight default link LLSelectedPCLine DiffText
+highlight default link GGBreakpointSign Type
+highlight default link GGUnselectedPCSign NonText
+highlight default link GGUnselectedPCLine DiffChange
+highlight default link GGSelectedPCSign Debug
+highlight default link GGSelectedPCLine DiffText
 
 execute 'sign define llsign_bpres text=' . s:bp_symbol .
-    \ ' texthl=LLBreakpointSign linehl=LLBreakpointLine'
+    \ ' texthl=GGBreakpointSign linehl=GGBreakpointLine'
 execute 'sign define llsign_pcsel text=' . s:pc_symbol .
-    \ ' texthl=LLSelectedPCSign linehl=LLSelectedPCLine'
+    \ ' texthl=GGSelectedPCSign linehl=GGSelectedPCLine'
 execute 'sign define llsign_pcunsel text=' . s:pc_symbol .
-    \ ' texthl=LLUnselectedPCSign linehl=LLUnselectedPCLine'
+    \ ' texthl=GGUnselectedPCSign linehl=GGUnselectedPCLine'

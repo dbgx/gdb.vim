@@ -36,7 +36,7 @@ function! gdb#session#complete(ArgLead, CmdLine, CursorPos)
   if a:CmdLine[-1:] == ' ' && a:CmdLine[-2:] != '\ '
     let toknum += 1
   endif
-  if tokens[0] == 'LLmode'
+  if tokens[0] == 'GGmode'
     return s:complete_prefix(gdb#remote#get_modes(), a:ArgLead)
   endif
   if toknum == 2

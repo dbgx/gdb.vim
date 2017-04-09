@@ -19,13 +19,13 @@ class Middleman:
         self.logger.setLevel(logging.INFO)
         self.ctrl = Controller(VimX(vim))
         if self.ctrl.vimx._vim_test:  # pylint: disable=protected-access
-            print("Note: `:LL-` commands are not bound with this test instance")
+            print("Note: `:GG-` commands are not bound with this test instance")
         else:
             vim.command('call gdb#remote#init(%d)' % vim.channel_id)
 
     # The only interface that is predefined in the remote plugin manifest file.
-    # The first execution of `:LLsession` initializes the remote part of the plugin.
-    @neovim.command('LLsession', nargs='+', complete='customlist,gdb#session#complete')
+    # The first execution of `:GGsession` initializes the remote part of the plugin.
+    @neovim.command('GGsession', nargs='+', complete='customlist,gdb#session#complete')
     def _session(self, args):
         self.ctrl.session.handle(*args)
 

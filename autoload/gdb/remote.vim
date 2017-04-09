@@ -1,6 +1,6 @@
 function! gdb#remote#__notify(event, ...) abort
   if !exists('g:gdb#_channel_id')
-    throw 'LLDB: channel id not defined!'
+    throw 'GDB: channel id not defined!'
   endif
   let arg_list = extend([g:gdb#_channel_id, a:event], a:000)
   call call('rpcnotify', arg_list)
@@ -13,7 +13,7 @@ function! gdb#remote#init(chan_id)
 endfun
 
 function! s:llcomplete(arg, line, pos)
-  let p = match(a:line, '^LL \+\zs')
+  let p = match(a:line, '^GG \+\zs')
   return rpcrequest(g:gdb#_channel_id, 'complete', a:arg, a:line[p : ], a:pos - p)
 endfun
 
@@ -54,16 +54,16 @@ function! gdb#remote#get_modes()
 endfun
 
 function! gdb#remote#define_commands()
-  command!  LLrefresh   call gdb#remote#__notify("refresh")
+  command!  GGrefresh   call gdb#remote#__notify("refresh")
   command!      -nargs=1    -complete=customlist,gdb#session#complete
-          \ LLmode      call gdb#remote#__notify("mode", <f-args>)
+          \ GGmode      call gdb#remote#__notify("mode", <f-args>)
   command!      -nargs=*    -complete=customlist,<SID>llcomplete
-          \ LL          call gdb#remote#__notify("exec", <f-args>)
+          \ GG          call gdb#remote#__notify("exec", <f-args>)
   command!      -nargs=?    -complete=customlist,<SID>stdincompl
-          \ LLstdin     call gdb#remote#stdin_prompt(<f-args>)
+          \ GGstdin     call gdb#remote#stdin_prompt(<f-args>)
 
-  nnoremap <silent> <Plug>LLBreakSwitch
+  nnoremap <silent> <Plug>GGBreakSwitch
           \ :call gdb#remote#__notify("breakswitch", bufnr("%"), getcurpos()[1])<CR>
-  vnoremap <silent> <Plug>LLStdInSelected
+  vnoremap <silent> <Plug>GGStdInSelected
           \ :<C-U>call gdb#remote#__notify("stdin", gdb#util#get_selection())<CR>
 endfun

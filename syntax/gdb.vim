@@ -1,61 +1,61 @@
 let name = expand('%')[5:]
 if name == 'logs'
-  syn match LLCmdMarker /→/ conceal contained
-  syn match LLCmd /→.*$/ contains=LLCmdMarker
-  syn match LLCmdOutMarker /✓/ conceal contained
-  syn match LLCmdOut /✓.*$/ contains=LLCmdOutMarker
-  syn match LLCmdErrMarker /✗/ conceal contained
-  syn match LLCmdErr /✗.*$/ contains=LLCmdErrMarker
+  syn match GGCmdMarker /→/ conceal contained
+  syn match GGCmd /→.*$/ contains=GGCmdMarker
+  syn match GGCmdOutMarker /✓/ conceal contained
+  syn match GGCmdOut /✓.*$/ contains=GGCmdOutMarker
+  syn match GGCmdErrMarker /✗/ conceal contained
+  syn match GGCmdErr /✗.*$/ contains=GGCmdErrMarker
 
-  hi def link LLCmdMarker Ignore
-  hi def link LLCmdOutMarker Ignore
-  hi def link LLCmdErrMarker Ignore
+  hi def link GGCmdMarker Ignore
+  hi def link GGCmdOutMarker Ignore
+  hi def link GGCmdErrMarker Ignore
 
-  hi def link LLCmd Comment
-  hi def link LLCmdOut Debug
-  hi def link LLCmdErr Exception
+  hi def link GGCmd Comment
+  hi def link GGCmdOut Debug
+  hi def link GGCmdErr Exception
 elseif name == 'backtrace'
-  syn match LLFrameNumber /frame \zs#[0-9]\+/ contained
-  syn match LLSelectedFrame /^  \* .*/ contains=LLFrameNumber
-  syn match LLOtherFrame /^    .*/ contains=LLFrameNumber
+  syn match GGFrameNumber /frame \zs#[0-9]\+/ contained
+  syn match GGSelectedFrame /^  \* .*/ contains=GGFrameNumber
+  syn match GGOtherFrame /^    .*/ contains=GGFrameNumber
 
-  hi def link LLFrameNumber Number
-  hi def link LLSelectedFrame Statement
-  hi def link LLOtherFrame Comment
+  hi def link GGFrameNumber Number
+  hi def link GGSelectedFrame Statement
+  hi def link GGOtherFrame Comment
 elseif name == 'breakpoints'
-  syn match LLBpId /^[0-9]\+/ contained
-  syn match LLBpParams /[a-z]\+ = \zs[^,]\+\|resolved/ contained
-  syn match LLBpLine /^[0-9]\+: .*/ contains=LLBpId,LLBpParams
-  syn match LLBpLocLine /^  [0-9]\+.[0-9]\+: .*/ contains=LLBpParams
+  syn match GGBpId /^[0-9]\+/ contained
+  syn match GGBpParams /[a-z]\+ = \zs[^,]\+\|resolved/ contained
+  syn match GGBpLine /^[0-9]\+: .*/ contains=GGBpId,GGBpParams
+  syn match GGBpLocLine /^  [0-9]\+.[0-9]\+: .*/ contains=GGBpParams
 
-  hi def link LLBpId Number
-  hi def link LLBpParams Identifier
-  hi def link LLBpLine Statement
-  hi def link LLBpLocLine Comment
+  hi def link GGBpId Number
+  hi def link GGBpParams Identifier
+  hi def link GGBpLine Statement
+  hi def link GGBpLocLine Comment
 elseif name == 'locals'
-  syn match LLVarType /^(\zs.\+\ze)/ contained
-  syn match LLVarIdent /) \zs\i\+\ze = /
-  syn match LLVarLine /^([^=]\+\i\+ = .*/ contains=LLVarType,LLVarIdent
+  syn match GGVarType /^(\zs.\+\ze)/ contained
+  syn match GGVarIdent /) \zs\i\+\ze = /
+  syn match GGVarLine /^([^=]\+\i\+ = .*/ contains=GGVarType,GGVarIdent
 
-  hi def link LLVarType Type
-  hi def link LLVarIdent Identifier
+  hi def link GGVarType Type
+  hi def link GGVarIdent Identifier
 elseif name == 'threads'
-  syn match LLThreadNumber /thread \zs#[0-9]\+/ contained
-  syn match LLThreadParams /[:,] [a-z ]\+ = \zs[^,]\+/ contained
-  syn match LLSelectedThread /^\* .*/ contains=LLThreadNumber,LLThreadParams
-  syn match LLOtherThread /^  .*/ contains=LLThreadNumber,LLThreadParams
+  syn match GGThreadNumber /thread \zs#[0-9]\+/ contained
+  syn match GGThreadParams /[:,] [a-z ]\+ = \zs[^,]\+/ contained
+  syn match GGSelectedThread /^\* .*/ contains=GGThreadNumber,GGThreadParams
+  syn match GGOtherThread /^  .*/ contains=GGThreadNumber,GGThreadParams
 
-  hi def link LLThreadNumber Number
-  hi def link LLThreadParams Identifier
-  hi def link LLSelectedThread Statement
-  hi def link LLOtherThread Comment
+  hi def link GGThreadNumber Number
+  hi def link GGThreadParams Identifier
+  hi def link GGSelectedThread Statement
+  hi def link GGOtherThread Comment
 elseif name == 'registers'
-  syn match LLRegHex /0x[0-9a-f]\+/
-  syn match LLRegIdent /^ \+\zs\i\+\ze = /
-  syn cluster LLRegLine contains=LLRegIdent,LLRegIdent
+  syn match GGRegHex /0x[0-9a-f]\+/
+  syn match GGRegIdent /^ \+\zs\i\+\ze = /
+  syn cluster GGRegLine contains=GGRegIdent,GGRegIdent
 
-  hi def link LLRegHex Number
-  hi def link LLRegIdent Identifier
+  hi def link GGRegHex Number
+  hi def link GGRegIdent Identifier
 elseif name == 'disassembly'
   set syntax=asm
 endif

@@ -67,7 +67,7 @@ class Session:  # pylint: disable=too-many-instance-attributes
             if self.vimx.eval("input('Launch the target? [y=yes] ', 'y')") == 'y':
                 self.state['modes']['debug']['setup'].append('run')
                 self.ctrl.execute('run')
-                self.vimx.log('Process launched! Try `:LLsession show`', 0)
+                self.vimx.log('Process launched! Try `:GGsession show`', 0)
             self.help_flags["launch_prompt"] = False
 
     def mode_teardown(self):
@@ -198,13 +198,13 @@ class Session:  # pylint: disable=too-many-instance-attributes
             self.vimx.map_buffers(json_show)
             if self.help_flags["new"] and self.help_flags["session_show"]:
                 self.vimx.log(
-                    'Save this file, and do `:LLsession reload` to load any changes made.')
+                    'Save this file, and do `:GGsession reload` to load any changes made.')
                 self.help_flags["session_show"] = False
         else:
             self.vimx.log("No active session.")
 
     def handle(self, cmd, *args):
-        """ Handler for :LLsession commands. """
+        """ Handler for :GGsession commands. """
         if cmd == 'new':
             self.handle_new()
         elif cmd == 'relod':
