@@ -1,2 +1,4 @@
 doc/tags
 *.pyc
+test/ab
+test/logs

@@ -8,7 +8,7 @@ long seqsum(long n) {
     return ret;
 }
 
-int main () {
+int main() {
     long a, b;
 
     printf("Enter a number:\n");

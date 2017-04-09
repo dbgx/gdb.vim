@@ -63,7 +63,7 @@ function! s:find_xfiles()
 endfun
 
 function! lldb#session#discard_prompt()
-  return input('Throw away the current session? [y=yes] ') == 'y'
+  return input('Discard the current session? [y=yes] ') == 'y'
 endfun
 
 function! lldb#session#new()

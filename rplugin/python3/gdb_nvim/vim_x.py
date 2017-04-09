@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 
-from Queue import Queue
+from queue import Queue
+from os import path
 
 __metaclass__ = type  # pylint: disable=invalid-name
 
@@ -97,7 +98,7 @@ class VimX:
                     if ret is not None:
                         mapped.append(ret)
                 except StopIteration as e:
-                    mapped.append(e.message)
+                    mapped.append(e.args[0])
                     breaked = True
                     break
             if not breaked:
@@ -132,7 +133,7 @@ class VimX:
                 else:
                     b[:] = content
                 b.options['ma'] = False
-                raise StopIteration
+                raise StopIteration(b.name)
 
         has_mod = True
         if append:
@@ -148,3 +149,7 @@ class VimX:
 
         if has_mod:
             self.map_buffers(update_mapper)
+
+    def abspath(self, relpath):
+        vim_cwd = self.eval("getcwd()")
+        return path.join(vim_cwd, relpath)

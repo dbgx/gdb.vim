@@ -6,20 +6,10 @@
         "code": {},
         "debug": {
             "setup": [
-                "target create {target}",
-                [ "bp", "set" ],
-                "process launch"
+                "file {target}",
+                "run"
             ],
-            "teardown": [
-                [ "bp", "save" ],
-                "target delete"
-            ]
+            "teardown": []
         }
-    },
-    "breakpoints": {
-        "ab.c": [ 6, 17 ],
-        "@ll": [
-            "breakpoint set -n main"
-        ]
     }
 }
