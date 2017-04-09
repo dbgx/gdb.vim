@@ -1,4 +1,4 @@
-let name = expand('%')[6:]
+let name = expand('%')[5:]
 if name == 'logs'
   syn match LLCmdMarker /→/ conceal contained
   syn match LLCmd /→.*$/ contains=LLCmdMarker

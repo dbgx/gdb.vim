@@ -54,7 +54,7 @@ class Session:  # pylint: disable=too-many-instance-attributes
             return
         self.mode_teardown()
         self.internal['@mode'] = mode
-        self.vimx.command("call call(g:lldb#session#mode_setup, ['%s'])" % mode)
+        self.vimx.command("call call(g:gdb#session#mode_setup, ['%s'])" % mode)
         if mode.startswith('debug'):
             self.ctrl.dbg_run()
             if 'setup' in self.state['modes'][mode]:
@@ -75,7 +75,7 @@ class Session:  # pylint: disable=too-many-instance-attributes
             mode = self.internal['@mode']
             if 'teardown' in self.state['modes'][mode]:
                 self.run_actions(self.state['modes'][mode]['teardown'])
-            self.vimx.command("call call(g:lldb#session#mode_teardown, ['%s'])" % mode)
+            self.vimx.command("call call(g:gdb#session#mode_teardown, ['%s'])" % mode)
             del self.internal['@mode']
             if mode.startswith('debug'):
                 self.ctrl.dbg_stop()
@@ -133,11 +133,11 @@ class Session:  # pylint: disable=too-many-instance-attributes
         self.mode_setup(list(self.state["modes"].keys())[0])
 
     def handle_new(self):
-        if self.isalive() and self.vimx.eval("lldb#session#discard_prompt()") == 0:
+        if self.isalive() and self.vimx.eval("gdb#session#discard_prompt()") == 0:
             self.vimx.log("Session left unchanged!", 0)
             return
 
-        ret = self.vimx.eval("lldb#session#new()")
+        ret = self.vimx.eval("gdb#session#new()")
         if not ret or '_file' not in ret:
             self.vimx.log("Skipped -- no session was created!")
             return
@@ -169,7 +169,7 @@ class Session:  # pylint: disable=too-many-instance-attributes
         self.vimx.log("New session created!", 0)
 
     def handle_load(self, confpath):
-        if self.isalive() and self.vimx.eval("lldb#session#discard_prompt()") == 0:
+        if self.isalive() and self.vimx.eval("gdb#session#discard_prompt()") == 0:
             self.vimx.log("Session left unchanged!", 0)
             return
 
@@ -216,7 +216,7 @@ class Session:  # pylint: disable=too-many-instance-attributes
                 self.handle_load(self.get_confpath())
         elif cmd == 'load':
             if len(args) == 0:
-                confpath = self.vimx.eval('findfile(g:lldb#session#file, ".;")')
+                confpath = self.vimx.eval('findfile(g:gdb#session#file, ".;")')
                 self.handle_load(confpath)
             elif len(args) == 1:
                 self.handle_load(args[0])

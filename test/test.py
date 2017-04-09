@@ -29,7 +29,7 @@ try:
 
   from time import sleep
   delay = 1
-  iface._session(['load', 'lldb-nvim.json'])
+  iface._session(['load', 'gdb-nvim.json'])
   sleep(delay)
   iface._mode('debug')
   sleep(2*delay)

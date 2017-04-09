@@ -1,6 +1,6 @@
 function! s:logs_clear()
   if input('Clear logs [y=yes]? ') == 'y'
-    if expand('%') == '[lldb]logs'
+    if expand('%') == '[gdb]logs'
       set ma
       norm! ggdG
       set noma
@@ -21,7 +21,7 @@ endfun
 
 " Returns [thread_id, frame_id] corresponding to the line in the backtrace buffer.
 " If any entry of the pair has no result, empty string will be used.
-function! lldb#layout#backtrace_retrieve()
+function! gdb#layout#backtrace_retrieve()
   let frame_idx_pattern = '^\s*\*\= frame #\zs\d\+'
   let thread_idx_pattern = '^\s*\*\= thread #\zs\d\+'
   let frame_id = matchstr(getline('.'), frame_idx_pattern)
@@ -35,20 +35,20 @@ endfun
 
 " Returns breakpoint id correnponding to the line in the breakpoint buffer.
 " If the result is invalid, empty string will be returned.
-function! lldb#layout#breakpoint_retrieve()
+function! gdb#layout#breakpoint_retrieve()
   let bp_idx_pattern = '^\s*\zs\d\+\.\=\d*'
   let frame_id = matchstr(getline('.'), bp_idx_pattern)
   return frame_id
 endfun
 
-function! lldb#layout#init_buffers()
+function! gdb#layout#init_buffers()
   let s:buffers = [ 'backtrace', 'breakpoints', 'disassembly',
                   \ 'locals', 'logs', 'registers', 'threads' ]
   let s:buffer_map = {}
   let u_bnr = bufnr('%')
   for bname in s:buffers
-    let bnr = bufnr('[lldb]' . bname, 1)
-    call setbufvar(bnr, '&ft', 'lldb')
+    let bnr = bufnr('[gdb]' . bname, 1)
+    call setbufvar(bnr, '&ft', 'gdb')
     call setbufvar(bnr, '&bt', 'nofile')
     call setbufvar(bnr, '&swf', 0)
     call setbufvar(bnr, '&ma', 0)
@@ -59,56 +59,56 @@ function! lldb#layout#init_buffers()
   return s:buffer_map
 endfun
 
-function! lldb#layout#init_window(width, split, bnr)
+function! gdb#layout#init_window(width, split, bnr)
   exe 'belowright ' . a:width . a:split . '+b' . a:bnr
   set nonu
   set nornu
   if s:buffer_map['logs'] == a:bnr
-    nnoremap <buffer> i :call lldb#remote#stdin_prompt()<CR>
+    nnoremap <buffer> i :call gdb#remote#stdin_prompt()<CR>
     nnoremap <silent> <buffer> <nowait> d :call <SID>logs_clear()<CR>
     nnoremap <silent> <buffer> <nowait> q :drop #<CR>
   elseif s:buffer_map['backtrace'] == a:bnr || s:buffer_map['threads'] == a:bnr
     if s:buffer_map['backtrace'] == a:bnr
-      nnoremap <silent> <buffer> a :call lldb#remote#__notify("btswitch")<CR>
-      nnoremap <silent> <buffer> t :drop [lldb]threads<CR>
+      nnoremap <silent> <buffer> a :call gdb#remote#__notify("btswitch")<CR>
+      nnoremap <silent> <buffer> t :drop [gdb]threads<CR>
     else
-      nnoremap <silent> <buffer> a :drop [lldb]backtrace<CR>
+      nnoremap <silent> <buffer> a :drop [gdb]backtrace<CR>
     endif
     nnoremap <silent> <buffer> <CR>
-            \ :call lldb#remote#__notify("select_thread_and_frame", lldb#layout#backtrace_retrieve())<CR>
+            \ :call gdb#remote#__notify("select_thread_and_frame", gdb#layout#backtrace_retrieve())<CR>
   elseif s:buffer_map['breakpoints'] == a:bnr
     nnoremap <silent> <buffer> <nowait> x
-            \ :call lldb#remote#__notify("breakdelete", lldb#layout#breakpoint_retrieve())<CR>
+            \ :call gdb#remote#__notify("breakdelete", gdb#layout#breakpoint_retrieve())<CR>
   endif
 endfun
 
-function! lldb#layout#setup(mode)
+function! gdb#layout#setup(mode)
   if a:mode != 'debug'
     return
   endif
   if !exists('s:buffer_map') || empty(s:buffer_map)
-    call lldb#layout#init_buffers()
+    call gdb#layout#init_buffers()
   endif
   0tab sp
   let winw2 = winwidth(0)*2/5
   let winw3 = winwidth(0)*3/5
   let winh2 = winheight(0)*2/3
-  call lldb#layout#init_window(winw3, 'vsp', s:buffer_map['threads'])
-  call lldb#layout#init_window(winh2, 'sp', s:buffer_map['disassembly'])
-  call lldb#layout#init_window(winw3/2, 'vsp', s:buffer_map['registers'])
+  call gdb#layout#init_window(winw3, 'vsp', s:buffer_map['threads'])
+  call gdb#layout#init_window(winh2, 'sp', s:buffer_map['disassembly'])
+  call gdb#layout#init_window(winw3/2, 'vsp', s:buffer_map['registers'])
   2wincmd h
   0tab sp
-  call lldb#layout#init_window(winw2, 'vsp', s:buffer_map['backtrace'])
-  call lldb#layout#init_window(winh2, 'sp', s:buffer_map['breakpoints'])
-  call lldb#layout#init_window(winh2/2, 'sp', s:buffer_map['locals'])
+  call gdb#layout#init_window(winw2, 'vsp', s:buffer_map['backtrace'])
+  call gdb#layout#init_window(winh2, 'sp', s:buffer_map['breakpoints'])
+  call gdb#layout#init_window(winh2/2, 'sp', s:buffer_map['locals'])
   wincmd h
-  call lldb#layout#init_window(winh2/2, 'sp', s:buffer_map['logs'])
+  call gdb#layout#init_window(winh2/2, 'sp', s:buffer_map['logs'])
   set cole=2 cocu=nc
   wincmd k
 endfun
 
 " tears down windows (and tabs) containing debug buffers
-function! lldb#layout#teardown(...)
+function! gdb#layout#teardown(...)
   if !exists('s:buffer_map') || empty(s:buffer_map)
     return
   endif
@@ -126,13 +126,13 @@ function! lldb#layout#teardown(...)
       endif
     endfor
     if bcount < 2*bdcount && bcount > bdcount
-      " close tab if majority of windows were lldb buffers
+      " close tab if majority of windows were gdb buffers
       tabc
     endif
   endfor
 endfun
 
-function! lldb#layout#signjump(bufnr, signid)
+function! gdb#layout#signjump(bufnr, signid)
   if bufwinnr(a:bufnr) < 0
     let wnr = -1
     let ll_bufnrs = values(s:buffer_map)

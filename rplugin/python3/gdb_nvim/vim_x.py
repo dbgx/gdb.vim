@@ -62,11 +62,11 @@ class VimX:
 
     def buffer_scroll_bottom(self, bufnr):
         """ Scroll to bottom for every window that displays the given buffer in the current tab """
-        self.call('lldb#util#buffer_do', bufnr, 'normal! G', async=True)
+        self.call('gdb#util#buffer_do', bufnr, 'normal! G', async=True)
 
     def sign_jump(self, bufnr, sign_id):
         """ Try jumping to the specified sign_id in buffer with number bufnr. """
-        self.call('lldb#layout#signjump', bufnr, sign_id, async=True)
+        self.call('gdb#layout#signjump', bufnr, sign_id, async=True)
 
     def sign_place(self, sign_id, name, bufnr, line):
         """ Place a sign at the specified location. """
@@ -118,8 +118,8 @@ class VimX:
         return self.map_buffers(name_mapper)[0]
 
     def init_buffers(self):
-        """ Create all lldb buffers and initialize the buffer map. """
-        buf_map = self.call('lldb#layout#init_buffers')
+        """ Create all gdb buffers and initialize the buffer map. """
+        buf_map = self.call('gdb#layout#init_buffers')
         return buf_map
 
     def update_noma_buffer(self, bufnr, content, append=False):  # noma => nomodifiable

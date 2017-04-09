@@ -1,5 +1,5 @@
 " stolen from http://stackoverflow.com/a/6271254/2849934
-function! lldb#util#get_selection()
+function! gdb#util#get_selection()
   let [lnum1, col1] = getpos("'<")[1:2]
   let [lnum2, col2] = getpos("'>")[1:2]
   let lines = getline(lnum1, lnum2)
@@ -8,7 +8,7 @@ function! lldb#util#get_selection()
   return join(lines, "\n")
 endfun
 
-function! lldb#util#buffer_do(bufnr, cmd)
+function! gdb#util#buffer_do(bufnr, cmd)
   let old_wnr = winnr()
   for wnr in range(1, winnr('$') + 1)
     if winbufnr(wnr) == a:bufnr

@@ -30,18 +30,18 @@ function! s:complete_prefix(list, lead)
   return ret
 endfun
 
-function! lldb#session#complete(ArgLead, CmdLine, CursorPos)
+function! gdb#session#complete(ArgLead, CmdLine, CursorPos)
   let tokens = split(a:CmdLine, '\%(^\|[^\\]\)\zs \+')
   let toknum = len(tokens)
   if a:CmdLine[-1:] == ' ' && a:CmdLine[-2:] != '\ '
     let toknum += 1
   endif
   if tokens[0] == 'LLmode'
-    return s:complete_prefix(lldb#remote#get_modes(), a:ArgLead)
+    return s:complete_prefix(gdb#remote#get_modes(), a:ArgLead)
   endif
   if toknum == 2
     let subcmds = ['new', 'load']
-    if exists('g:lldb#_channel_id')
+    if exists('g:gdb#_channel_id')
       call extend(subcmds, ['bp-save', 'bp-set', 'reload', 'show'])
     endif
     return s:complete_prefix(subcmds, a:ArgLead)
@@ -62,12 +62,12 @@ function! s:find_xfiles()
   endif
 endfun
 
-function! lldb#session#discard_prompt()
+function! gdb#session#discard_prompt()
   return input('Discard the current session? [y=yes] ') == 'y'
 endfun
 
-function! lldb#session#new()
-  let session_file = input('Write session file to: ', g:lldb#session#file, 'file')
+function! gdb#session#new()
+  let session_file = input('Write session file to: ', g:gdb#session#file, 'file')
   if len(session_file) == 0
     return {}
   endif

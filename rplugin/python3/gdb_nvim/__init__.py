@@ -21,11 +21,11 @@ class Middleman:
         if self.ctrl.vimx._vim_test:  # pylint: disable=protected-access
             print("Note: `:LL-` commands are not bound with this test instance")
         else:
-            vim.command('call lldb#remote#init(%d)' % vim.channel_id)
+            vim.command('call gdb#remote#init(%d)' % vim.channel_id)
 
     # The only interface that is predefined in the remote plugin manifest file.
     # The first execution of `:LLsession` initializes the remote part of the plugin.
-    @neovim.command('LLsession', nargs='+', complete='customlist,lldb#session#complete')
+    @neovim.command('LLsession', nargs='+', complete='customlist,gdb#session#complete')
     def _session(self, args):
         self.ctrl.session.handle(*args)
 
@@ -38,7 +38,7 @@ class Middleman:
         self.ctrl.execute(' '.join(args))
 
         if args[0] == 'help':
-            self.ctrl.vimx.command('drop [lldb]logs')
+            self.ctrl.vimx.command('drop [gdb]logs')
 
     @neovim.rpc_export('stdin')
     def _stdin(self, strin):
