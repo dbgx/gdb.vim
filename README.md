@@ -1,5 +1,7 @@
 # GDB Neovim Frontend
 
+**Warning: Under development. Repository will be moved.**
+
 This plugin provides GDB debugger integration for Neovim ([demo gif]) featuring:
 
 * Elaborate view of debugger state
