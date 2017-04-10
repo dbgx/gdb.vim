@@ -13,7 +13,7 @@ function! gdb#remote#init()
   let cmd = ['python3', g:gdb#_server]
   let g:gdb#_job = job_start(cmd, { 'in_mode': 'json',
                                   \ 'out_mode': 'json',
-                                  \ 'err_mode': 'raw',
+                                  \ 'err_mode': 'nl',
                                   \ 'err_io': 'buffer',
                                   \ 'err_name': '[gdb]logs'})
   au VimLeavePre * call gdb#remote#__notify('exit')

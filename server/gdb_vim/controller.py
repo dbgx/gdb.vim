@@ -160,9 +160,11 @@ class Controller():  # pylint: disable=too-many-instance-attributes
             responses = self.dbg.get_gdb_response(timeout_sec=0.5)
         except ValueError as e:
             self.logger.warning('Gdb poke error: %s', e)
+            return
         except Exception as e:
             self.logger.critical('Unexpected error: %s', e)
             self.dbg_stop()
+            return
 
         for resp in responses:
             if resp['type'] == 'result':
