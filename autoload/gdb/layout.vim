@@ -8,6 +8,13 @@ function! s:logs_clear()
   endif
 endfun
 
+function! gdb#layout#update_buffer(bufnr, content)
+  exe bufnr . 'bufdo setlocal ma'
+  exe bufnr . 'bufdo normal! ggdG'
+  exe bufnr . 'bufdo call append(0, '.string(content).')'
+  exe bufnr . 'bufdo setlocal noma'
+endfun
+
 " Given the regex, extracts the match from the current line in the buffer.
 " If there's no match, the fallback_str is returned.
 function! s:matchstr_with_fallback(line, regex, fallback_str)

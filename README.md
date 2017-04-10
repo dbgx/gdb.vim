@@ -12,8 +12,7 @@ and communicates with the Neovim process using RPC calls.
 
 ## Prerequisites
 
-* [Neovim](https://github.com/neovim/neovim)
-* [Neovim python3-client](https://github.com/neovim/python-client) (release >= 0.1.6)
+* [Vim](https://github.com/vim/vim)
 * [GDB](https://www.gnu.org/software/gdb/)
 * [Pygdbmi](https://github.com/cs01/pygdbmi)
 
@@ -22,13 +21,13 @@ and communicates with the Neovim process using RPC calls.
 1. Using a plugin manager such as [vim-plug](https://github.com/junegunn/vim-plug):
 
    ```
-       Plug 'dbgx/gdb.nvim'
+       Plug 'dbgx/gdb.vim'
    ```
 
-   Alternatively, clone this repo, and add the following line to your nvimrc:
+   Alternatively, clone this repo, and add the following line to your vimrc:
 
    ```
-       set rtp+=/path/to/gdb.nvim
+       set rtp+=/path/to/gdb.vim
    ```
 
 2. Execute:

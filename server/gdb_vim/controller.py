@@ -1,6 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 
-from threading import Thread, Event
 from queue import Queue, Empty, Full
 from signal import SIGINT
 from os import path
@@ -13,7 +12,7 @@ from pygdbmi.gdbcontroller import GdbController
 __metaclass__ = type  # pylint: disable=invalid-name
 
 
-class Controller(Thread):  # pylint: disable=too-many-instance-attributes
+class Controller():  # pylint: disable=too-many-instance-attributes
     """ Thread object that handles GDB events and commands. """
 
     def __init__(self, vimx):
@@ -21,12 +20,10 @@ class Controller(Thread):  # pylint: disable=too-many-instance-attributes
         import logging
         self.logger = logging.getLogger(__name__)
 
-        self._dbg = None
+        self.dbg = None
 
         self._proc_cur_line_len = 0
         self._proc_lines_count = 0
-        self._ready = Event()
-        self._ready.clear()
 
         self.result_queue = Queue(maxsize=1)
 
@@ -35,17 +32,17 @@ class Controller(Thread):  # pylint: disable=too-many-instance-attributes
         self.buffers = VimBuffers(self, vimx)
         self.session = Session(self, vimx)
 
-        super(Controller, self).__init__()
-        self.start() # start the thread
+    def dbg_start(self):
+        if self.dbg is None:
+            self.dbg = GdbController()
 
-    def dbg_run(self):
-        if self._dbg is None:
-            self._dbg = GdbController()
-            self._ready.set()
+    def dbg_interrupt(self):
+        self.dbg.gdb_process.send_signal(SIGINT) # what if remote process?
 
     def dbg_stop(self):
-        self._ready.clear()
-        self._dbg.gdb_process.send_signal(SIGINT) # remote process?
+        self.dbg.exit()
+        self.dbg = None
+        self.logger.info('Terminated!')
 
     def is_busy(self):
         return self.busy_stack > 0
@@ -66,7 +63,17 @@ class Controller(Thread):  # pylint: disable=too-many-instance-attributes
         return []
 
     def serialize_mijson(self, result):
-        self.buffers.logs_append(str(result) + '\n', u'\u2713') # \u2717 for error
+        out = "message: {}, stream: {}, token: {}, type: {}\n".format(result.get('message'),
+                                                                      result.get('stream'),
+                                                                      result.get('token'),
+                                                                      result.get('type'))
+        payload = result.get('payload')
+        if isinstance(payload, str):
+            payload = payload.encode('utf8').decode('unicode_escape')
+        else:
+            payload = str(payload)
+        out += "{}\n".format(payload)
+        self.buffers.logs_append(out, u'\u2713')
 
     def execute(self, command):
         """ Run command in the interpreter, refresh all buffers, and display the
@@ -74,7 +81,10 @@ class Controller(Thread):  # pylint: disable=too-many-instance-attributes
         """
         self.buffers.logs_append(u'\u2192(gdb) {}\n'.format(command))
         result = self.get_command_result(command)
-        self.serialize_mijson(result)
+        if result is not None:
+            self.serialize_mijson(result)
+        else:
+            self.logs_append("error\n", u'\u2717')
 
         self.update_buffers()
 
@@ -118,7 +128,7 @@ class Controller(Thread):  # pylint: disable=too-many-instance-attributes
 
     def put_stdin(self, instr):
         #if process is running:
-        self._dbg.write(instr, 0, read_response=False)
+        self.dbg.write(instr, 0, read_response=False)
 
     def get_command_result(self, command):
         """ Runs command in the interpreter and returns (success, output)
@@ -127,7 +137,7 @@ class Controller(Thread):  # pylint: disable=too-many-instance-attributes
         """
         #if process is not running:
         self.logger.info('(gdb) %s', command)
-        self._dbg.write(command, 0, read_response=False)
+        self.dbg.write(command, 0, read_response=False)
 
         try:
             result = self.result_queue.get(block=True, timeout=3)
@@ -137,47 +147,37 @@ class Controller(Thread):  # pylint: disable=too-many-instance-attributes
 
         return result
 
-    def _dbg_loop(self):
-        to_count = 0
-        while self._ready.is_set():
-            try:
-                responses = self._dbg.get_gdb_response(timeout_sec=1)
-                to_count = 0
-            except ValueError:
-                to_count += 1
-                if to_count > 3*3600:  # 3 hours: expected to occur only if timeout isn't timing out!
-                    self.logger.critical('Broke the loop barrier!')
-                    break
-            except Exception as e:
-                self.logger.critical('Unexpected error %s', e)
-                break
+    def poke(self):
+        """ Pokes the gdb process for responses. """
+        try:
+            responses = self.dbg.get_gdb_response(timeout_sec=0.5)
+            to_count = 0
+        except ValueError as e:
+            self.logger.warning('Gdb poke error: %s', e)
+        except Exception as e:
+            self.logger.critical('Unexpected error: %s', e)
+            self.dbg_stop()
 
-            for resp in responses:
-                if resp['type'] == 'result':
-                    if self.result_queue.full():  # garbage?
-                        self.result_queue.get()   # clean
-                    self.result_queue.put(resp)
+        for resp in responses:
+            if resp['type'] == 'result':
+                if self.result_queue.full():  # garbage?
+                    self.result_queue.get()   # clean
+                self.result_queue.put(resp)
+            else:
+                #self.serialize_mijson(resp)
+                pass
 
-                # TODO handle 'notify' events
-                # TODO handle 'output' and 'target' events
-                # TODO handle 'console', 'log' and 'done' events
+            # TODO handle 'notify' events
+            # TODO handle 'output' and 'target' events
+            # TODO handle 'console', 'log' and 'done' events
 
-            #n_lines = self.buffers.logs_append(out)
-            #if n_lines == 0:
-            #    self._proc_cur_line_len += len(out)
-            #else:
-            #    self._proc_cur_line_len = 0
-            #    self._proc_lines_count += n_lines
-            #if self._proc_cur_line_len > 8192 or self._proc_lines_count > 2048:
-            #    # detect and stop/kill insane process
-            #    self._dbg.gdb_process.send_signal(SIGINT) # remote process?
-            #    break
-
-        self._dbg.exit()
-        self._dbg = None
-        self._ready.clear()
-        self.logger.info('Terminated!')
-
-    def run(self):
-        while self._ready.wait():
-            self._dbg_loop()
+        #n_lines = self.buffers.logs_append(out)
+        #if n_lines == 0:
+        #    self._proc_cur_line_len += len(out)
+        #else:
+        #    self._proc_cur_line_len = 0
+        #    self._proc_lines_count += n_lines
+        #if self._proc_cur_line_len > 8192 or self._proc_lines_count > 2048:
+        #    # detect and stop/kill insane process
+        #    self.dbg.gdb_process.send_signal(SIGINT) # remote process?
+        #    break

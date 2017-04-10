@@ -37,7 +37,7 @@ function! gdb#session#complete(ArgLead, CmdLine, CursorPos)
     let toknum += 1
   endif
   if tokens[0] == 'GGmode'
-    return s:complete_prefix(gdb#remote#get_modes(), a:ArgLead)
+    return s:complete_prefix(['code', 'debug'], a:ArgLead)
   endif
   if toknum == 2
     let subcmds = ['new', 'load']

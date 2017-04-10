@@ -56,7 +56,7 @@ class Session:  # pylint: disable=too-many-instance-attributes
         self.internal['@mode'] = mode
         self.vimx.command("call call(g:gdb#session#mode_setup, ['%s'])" % mode)
         if mode.startswith('debug'):
-            self.ctrl.dbg_run()
+            self.ctrl.dbg_start()
             if 'setup' in self.state['modes'][mode]:
                 self.run_actions(self.state['modes'][mode]['setup'])
             self.ctrl.update_buffers()

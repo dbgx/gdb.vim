@@ -6,4 +6,4 @@ TEST_DIR=$( python2 -c "from os.path import realpath
 print realpath(\"$(dirname "$0")\")" ) # resolve symlinks
 cd "$TEST_DIR"
 gcc -g -o ab ab.c
-nvim -c 'e term://python3\ -i\ test.py'
+vim -c 'GGsession load gdb-vim.json' #-c 'GGmode debug' #FIXME

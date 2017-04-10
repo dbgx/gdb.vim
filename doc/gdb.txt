@@ -92,7 +92,7 @@ CUSTOMIZING                                             *gdb-customizing*
 
                                                 *g:gdb#session#file*
 g:gdb#session#file ~
-        Default session file name: `gdb-nvim.json`
+        Default session file name: `gdb-vim.json`
 
                                                 *g:gdb#session#mode_teardown*
 g:gdb#session#mode_teardown ~
@@ -275,13 +275,7 @@ FEEDBACK AND ISSUES                                     *gdb-bugs*
 
 If you run into a bug, use the Github issue tracker to report it:
 
-https://github.com/dbgx/gdb.nvim/issues
-
-It would be nice if you could set the following environment variable:
->
-    export NVIM_PYTHON_LOG_FILE=/tmp/nvlog
-<
-and post the log along with the bug report.
+https://github.com/dbgx/gdb.vim/issues
 
 ==============================================================================
 

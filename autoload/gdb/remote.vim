@@ -1,20 +1,23 @@
 function! gdb#remote#__notify(event, ...) abort
-  if !exists('g:gdb#_channel_id')
-    throw 'GDB: channel id not defined!'
+  if !exists('g:gdb#_job')
+    throw 'GDB: job does not exist!'
   endif
-  let arg_list = extend([g:gdb#_channel_id, a:event], a:000)
-  call call('rpcnotify', arg_list)
+  let arg_list = extend([a:event], a:000)
+  call ch_sendexpr(g:gdb#_job, arg_list)
 endfun
 
-function! gdb#remote#init(chan_id)
-  let g:gdb#_channel_id = a:chan_id
+function! gdb#remote#init()
+  if exists('g:gdb#_job') && job_status(g:gdb#_job) == 'run'
+    throw 'GDB: job already running'
+  endif
+  let cmd = ['python3', g:gdb#_server]
+  let g:gdb#_job = job_start(cmd, { 'in_mode': 'json',
+                                  \ 'out_mode': 'json',
+                                  \ 'err_mode': 'raw',
+                                  \ 'err_io': 'buffer',
+                                  \ 'err_name': '[gdb]logs'})
   au VimLeavePre * call gdb#remote#__notify('exit')
   call gdb#remote#define_commands()
-endfun
-
-function! s:llcomplete(arg, line, pos)
-  let p = match(a:line, '^GG \+\zs')
-  return rpcrequest(g:gdb#_channel_id, 'complete', a:arg, a:line[p : ], a:pos - p)
 endfun
 
 let s:ctrlchars = { 'BS': "\b",
@@ -54,13 +57,16 @@ function! gdb#remote#get_modes()
 endfun
 
 function! gdb#remote#define_commands()
-  command!  GGrefresh   call gdb#remote#__notify("refresh")
-  command!      -nargs=1    -complete=customlist,gdb#session#complete
-          \ GGmode      call gdb#remote#__notify("mode", <f-args>)
-  command!      -nargs=*    -complete=customlist,<SID>llcomplete
-          \ GG          call gdb#remote#__notify("exec", <f-args>)
-  command!      -nargs=?    -complete=customlist,<SID>stdincompl
-          \ GGstdin     call gdb#remote#stdin_prompt(<f-args>)
+  command!           GGrefresh call gdb#remote#__notify("refresh")
+
+  command! -nargs=1       -complete=customlist,gdb#session#complete
+          \          GGmode    call gdb#remote#__notify("mode", <f-args>)
+
+  command! -nargs=*  GG        call gdb#remote#__notify("exec", <f-args>)
+  command! -nargs=?       -complete=customlist,<SID>stdincompl
+          \          GGstdin   call gdb#remote#stdin_prompt(<f-args>)
+  command! -nargs=+       -complete=customlist,gdb#session#complete
+          \          GGsession call gdb#remote#__notify("session", <f-args>)
 
   nnoremap <silent> <Plug>GGBreakSwitch
           \ :call gdb#remote#__notify("breakswitch", bufnr("%"), getcurpos()[1])<CR>
