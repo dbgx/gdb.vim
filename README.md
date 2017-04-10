@@ -1,21 +1,20 @@
-# GDB Neovim Frontend
+# GDB Vim Frontend
 
 **Warning: Under development. Repository will be moved.**
 
-This plugin provides GDB debugger integration for Neovim ([demo gif]) featuring:
+This plugin provides GDB debugger integration for Vim ([demo gif]) featuring:
 
 * Elaborate view of debugger state
 * Event-based, non-blocking UI
 * Jump to code from Backtrace or Threads windows
 * Define commands to replay when switching between modes (`code <-> debug`)
 
-This plugin takes advantage of Neovim's job API to spawn a separate process
-and communicates with the Neovim process using RPC calls.
+This plugin takes advantage of Vim's job API.
 
 ## Prerequisites
 
-* [Vim](https://github.com/vim/vim)
-* [GDB](https://www.gnu.org/software/gdb/)
+* [Vim 8.0+](https://github.com/vim/vim) (for `+channel` and `+job` support)
+* [GDB 7.7+](https://www.gnu.org/software/gdb/)
 * [Pygdbmi](https://github.com/cs01/pygdbmi)
 
 ## Installation
@@ -31,14 +30,6 @@ and communicates with the Neovim process using RPC calls.
    ```
        set rtp+=/path/to/gdb.vim
    ```
-
-2. Execute:
-
-   ```
-       :UpdateRemotePlugins
-   ```
-
-   and restart Neovim.
 
 ## Goals
 

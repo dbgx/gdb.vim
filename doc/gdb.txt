@@ -30,8 +30,7 @@ INTRODUCTION                                            *gdb-intro*
 The plugin provides an interface to the gdb debugger allowing for convenient
 debugging sessions inside your favorite editor.
 
-The plugin takes advantage of Neovim's job API to spawn a separate process and
-communicates with the Neovim process using RPC calls.
+The plugin takes advantage of Vim's job API.
 
 ==============================================================================
 
@@ -47,7 +46,7 @@ FEATURES                                                *gdb-features*
 GETTING STARTED                                         *gdb-start*
 
 To quickly get started, compile (with debugging symbols) the source and
-open a source file belonging to the program in Neovim, and execute
+open a source file belonging to the program in Vim, and execute
 >
     :GGsession new
 <
