@@ -1,6 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 
-from multiprocessing import Queue
 from select import select
 import logging
 
@@ -15,28 +14,16 @@ class Middleman:
     def __init__(self, vimx):
         self.ctrl = Controller(vimx)
         self.vimx = vimx
-        self.queue = Queue(maxsize=2)
         self.logger = logging.getLogger(__name__)
-
-    def safe_exec(self, fn):
-        """ fn should take a VimX object as the only argument. """
-        self.queue.put(['exec', fn])
 
     def loop(self):
         while True:
-            rlist = [self.vimx.ch_in, self.queue._reader]
+            rlist = [self.vimx.ch_in]
             if self.ctrl.dbg is not None:
                 rlist += self.ctrl.dbg.read_list
             ready, _, _ = select(rlist, [], [], 2)
             for ev in ready:
-                if ev == self.queue._reader:
-                    req = self.queue.get()
-                    if req[0] == 'exec':
-                        fn = req[1]
-                        fn(self.vimx)
-                    elif req[0] == 'exit':
-                        break
-                elif ev == self.vimx.ch_in:
+                if ev == self.vimx.ch_in:
                     msg = self.vimx.wait()
                     self._handle(msg)
                 else:

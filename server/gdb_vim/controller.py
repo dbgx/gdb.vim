@@ -1,6 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 
-from queue import Queue, Empty, Full
 from signal import SIGINT
 from os import path
 
@@ -25,7 +24,7 @@ class Controller():  # pylint: disable=too-many-instance-attributes
         self._proc_cur_line_len = 0
         self._proc_lines_count = 0
 
-        self.result_queue = Queue(maxsize=1)
+        self.result_queue = []
 
         self.vimx = vimx
         self.busy_stack = 0  # when > 0, buffers are not updated
@@ -135,23 +134,30 @@ class Controller():  # pylint: disable=too-many-instance-attributes
             Not to be called directly for commands which changes debugger state;
             use execute instead.
         """
-        #if process is not running:
+        #FIXME run only if process is not running?
+
+        if len(self.result_queue) > 0: # garbage?
+            self.logger.warning('result cleaned: %s', self.result_queue.pop())
+            self.result_queue = []     # clean
         self.logger.info('(gdb) %s', command)
         self.dbg.write(command, 0, read_response=False)
 
-        try:
-            result = self.result_queue.get(block=True, timeout=3)
-        except Empty:
-            self.logger.warning('(gdb-no-result) %s', command)
-            return None
-
+        count = 0
+        while len(self.result_queue) == 0:
+            self.poke()
+            count += 1
+            if count > 8:
+                self.logger.warning('(gdb-no-result) %s', command)
+                return None
+        result = self.result_queue.pop()
         return result
 
     def poke(self):
         """ Pokes the gdb process for responses. """
+        if self.dbg is None:
+            raise ValueError('Poked a non-existent dbg!')
         try:
             responses = self.dbg.get_gdb_response(timeout_sec=0.5)
-            to_count = 0
         except ValueError as e:
             self.logger.warning('Gdb poke error: %s', e)
         except Exception as e:
@@ -160,12 +166,9 @@ class Controller():  # pylint: disable=too-many-instance-attributes
 
         for resp in responses:
             if resp['type'] == 'result':
-                if self.result_queue.full():  # garbage?
-                    self.result_queue.get()   # clean
-                self.result_queue.put(resp)
+                self.result_queue.append(resp)
             else:
-                #self.serialize_mijson(resp)
-                pass
+                self.serialize_mijson(resp)
 
             # TODO handle 'notify' events
             # TODO handle 'output' and 'target' events

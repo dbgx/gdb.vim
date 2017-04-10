@@ -7,6 +7,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 from os import path
+from sys import stderr
 from .vim_signs import BPSign, PCSign
 
 __metaclass__ = type  # pylint: disable=invalid-name
@@ -52,7 +53,8 @@ class VimBuffers:  # pylint: disable=too-many-instance-attributes
             if len(last_line) > 0:
                 last_line = prefix + last_line
             lines = [prefix + line for line in lines[:-1]] + [last_line]
-        self.vimx.update_noma_buffer(self.buf_map['logs'], lines, append=True)
+        print('\n'.join(lines), file=stderr)
+        #self.vimx.update_noma_buffer(self.buf_map['logs'], lines, append=True)
         self.vimx.buffer_scroll_bottom(self.buf_map['logs'])
         return len(lines) - 1
 

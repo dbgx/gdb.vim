@@ -1,6 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 
-from queue import Queue
 from os import path
 import logging
 import json
@@ -57,8 +56,7 @@ class VimX:
             obj += [self.counter]
         self.write(obj)
         if reply:
-            re = self.wait(expect=self.counter)
-            return re[1]
+            return self.wait(expect=self.counter)
 
     def eval(self, expr, reply=True):
         obj = ['expr', expr]
@@ -67,8 +65,7 @@ class VimX:
             obj += [self.counter]
         self.write(obj)
         if reply:
-            re = self.wait(expect=self.counter)
-            return re
+            return self.wait(expect=self.counter)
 
     def command(self, cmd):
         obj = ['ex', cmd]
