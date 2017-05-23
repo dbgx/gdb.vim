@@ -9,10 +9,13 @@ function! s:logs_clear()
 endfun
 
 function! gdb#layout#update_buffer(bufnr, content)
-  exe bufnr . 'bufdo setlocal ma'
-  exe bufnr . 'bufdo normal! ggdG'
-  exe bufnr . 'bufdo call append(0, '.string(content).')'
-  exe bufnr . 'bufdo setlocal noma'
+  call setbufvar(a:bufnr, '&ma', 1)
+  let bcur = bufnr('%')
+  exe a:bufnr . 'b'
+  normal! ggdG
+  call append(0, a:content)
+  exe bcur . 'b'
+  call setbufvar(a:bufnr, '&ma', 0)
 endfun
 
 " Given the regex, extracts the match from the current line in the buffer.
@@ -59,7 +62,7 @@ function! gdb#layout#init_buffers()
     call setbufvar(bnr, '&bt', 'nofile')
     call setbufvar(bnr, '&swf', 0)
     call setbufvar(bnr, '&ma', 0)
-    call setbufvar(bnr, '&bl', 0)
+    "call setbufvar(bnr, '&bl', 0)
     let s:buffer_map[bname] = bnr
   endfor
   exe 'silent b ' . u_bnr

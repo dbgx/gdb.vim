@@ -54,6 +54,7 @@ class VimBuffers:  # pylint: disable=too-many-instance-attributes
                 last_line = prefix + last_line
             lines = [prefix + line for line in lines[:-1]] + [last_line]
         print('\n'.join(lines), file=stderr)
+        stderr.flush()
         #self.vimx.update_noma_buffer(self.buf_map['logs'], lines, append=True)
         self.vimx.buffer_scroll_bottom(self.buf_map['logs'])
         return len(lines) - 1
