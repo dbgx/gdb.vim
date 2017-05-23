@@ -1,6 +1,6 @@
 # GDB Vim Frontend
 
-**Warning: Under development. Repository will be moved.**
+**Warning: Under development. Development currently stalled due to issues with Vim.**
 
 This plugin provides GDB debugger integration for Vim ([demo gif]) featuring:
 
